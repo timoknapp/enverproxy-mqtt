@@ -17,7 +17,7 @@ from enverbridge import enverbridge
 
 config = configparser.ConfigParser()
 config['internal']              = {}
-config['internal']['conf_file'] = '/etc/enverproxy.conf'
+config['internal']['conf_file'] = '/etc/enverproxy-mqtt.conf'
 config['internal']['section']   = 'enverproxy'
 config['internal']['version']   = '3.1'
 config['internal']['keys']      = "['buffer_size', 'delay', 'listen_port', 'verbosity', 'log_type', 'log_address', 'log_port', 'forward_IP', 'forward_port', 'mqttuser', 'mqttpassword', 'mqtthost', 'mqttport', 'id2device']"
@@ -328,23 +328,33 @@ if __name__ == '__main__':
         log.logMsg('Stopping server', 1)
         sys.exit(1)
     # Process configuration data
-    forward_to  = (config['enverproxy']['forward_IP'], int(config['enverproxy']['forward_port']))
-    delay       = float(config['enverproxy']['delay'])
-    buffer_size = int(config['enverproxy']['buffer_size'])
-    port        = int(config['enverproxy']['listen_port'])
-    verbosity   = int(config['enverproxy']['verbosity'])
-    log_type    = config['enverproxy']['log_type']
-    log_address = config['enverproxy']['log_address']
-    log_port    = int(config['enverproxy']['log_port'])
+    buffer_size = int(os.getenv('BUFFER_SIZE', config.get('enverproxy', 'buffer_size')))
+    delay = float(os.getenv('DELAY', config.get('enverproxy', 'delay')))
+    port = int(os.getenv('LISTEN_PORT', config.get('enverproxy', 'listen_port')))
+    verbosity = int(os.getenv('VERBOSITY', config.get('enverproxy', 'verbosity')))
+    log_type = os.getenv('LOG_TYPE', config.get('enverproxy', 'log_type'))
+    log_address = os.getenv('LOG_ADDRESS', config.get('enverproxy', 'log_address'))
+    log_port = int(os.getenv('LOG_PORT', config.get('enverproxy', 'log_port')))
+    # Forward server configuration
+    forward_IP = os.getenv('FORWARD_IP', config.get('enverproxy', 'forward_IP'))
+    forward_port = int(os.getenv('FORWARD_PORT', config.get('enverproxy', 'forward_port')))
+    forward_to  = (forward_IP, forward_port)
+    # MQTT configuration
+    mqttuser = os.getenv('MQTTUSER', config.get('enverproxy', 'mqttuser'))
+    mqttpassword = os.getenv('MQTTPASSWORD', config.get('enverproxy', 'mqttpassword'))
+    mqtthost = os.getenv('MQTTHOST', config.get('enverproxy', 'mqtthost'))
+    mqttport = int(os.getenv('MQTTPORT', config.get('enverproxy', 'mqttport')))
+    id2device = ast.literal_eval(os.getenv('ID2DEVICE', config.get('enverproxy', 'ID2device')))
+    # Instantiate the logging object
     log         = slog('Envertec Proxy', verbosity, log_type, log_address, log_port)
     log.logMsg('Starting server (v' + config['internal']['version'] + ')', 1)
     log.logMsg('Log verbosity: ' + str(verbosity), 1)
     # Instantiate the proxy server
     server      = TheServer(host = '', port = port, forward_to = forward_to, delay = delay, buffer_size = buffer_size, log = log)
     # Instantiate the connection to MQTT and the Enverbridge protocol handling
-    mqtt        = MQTT(host = config['enverproxy']['mqtthost'], user = config['enverproxy']['mqttuser'], password = config['enverproxy']['mqttpassword'], port = int(config['enverproxy']['mqttport']), log = log)
+    mqtt        = MQTT(host = mqtthost, user = mqttuser, password = mqttpassword, port = mqttport, log = log)
     mqtt.connect_mqtt()
-    device      = enverbridge(mqtt = mqtt, id2device = ast.literal_eval(config['enverproxy']['id2device']), log = log)
+    device      = enverbridge(mqtt = mqtt, id2device = id2device, log = log)
     server.set_device(device)
     # Catch SIGTERM signals    
     signal.signal(signal.SIGTERM, Signal_handler(server, log).sigterm_handler)

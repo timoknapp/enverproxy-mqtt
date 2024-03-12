@@ -4,12 +4,12 @@ import paho.mqtt.client as mqtt
 
 class MQTT:
     
-    def __init__(self, host = None, user = '', password = '', port = '1883', log = None):    
+    def __init__(self, host = '', user = '', password = '', port = '1883', log = None):
         if log == None:
             self.__log = slog('MQTT class', True)
         else:
             self.__log = log
-        if host == None:
+        if host == '':
             self.__log.logMsg('Error in MQTT class: No host url set!',2)
         else:
             self.__host           = host

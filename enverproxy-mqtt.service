@@ -1,0 +1,14 @@
+[Unit]
+Description=EnverBridge Proxy Server
+After=syslog.target network-online.target
+
+[Service]
+Type=simple
+User=username
+ExecStart=/opt/enverproxy-mqtt/enverproxy.py
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
