@@ -23,7 +23,7 @@ There is a proxy mode, but I'm not using it, so this is totally untested.
 
 ## I've found a bug
 
-Just open an [issue](https://github.com/zivillian/enverproxy/issues/new) with as many details as possible.
+Just open an [issue](https://github.com/timoknapp/enverproxy-mqtt/issues/new) with as many details as possible.
 
 ## Helpful links
 
