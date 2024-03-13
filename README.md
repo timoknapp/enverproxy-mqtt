@@ -35,13 +35,17 @@ git clone https://github.com/timoknapp/enverproxy-mqtt.git
 docker build -t enverproxy-mqtt .
 # Start the container (replace the environment variables with your settings)
 docker run \
+    --name enverproxy-mqtt \
+    -d \
+    --restart=unless-stopped \
     -e LISTEN_PORT=1898 \
     -e MQTTUSER=user \
     -e MQTTPASSWORD=password \
     -e MQTTHOST="127.0.0.1" \
     -e MQTTPORT=1883 \
     -e ID2DEVICE="{'123456' : 'bkw_panel_1', '123457' : 'bkw_panel_2'}" \
-    -p 1898:1898 \
+    -e VERBOSITY=3 \
+    -p 1898:1898 -p 10013:1898 -p 14889:1898 \
     enverproxy-mqtt
 ```
 
@@ -53,7 +57,7 @@ You can use environment variables either in the Linux or Docker setup. The envir
 - `BUFFER_SIZE`: The size of the buffer used by the proxy. This determines how much data can be stored in memory at once.
 - `DELAY`: The delay between data transmissions. This can be used to control the rate of data flow.
 - `LISTEN_PORT`: The port on which the proxy listens for incoming connections.
-- `VERBOSITY`: The level of detail in the proxy's log output. Higher values will result in more detailed logs.
+- `VERBOSITY`: The level of detail in the proxy's log output. Higher values will result in more detailed logs. (Verbosity levels (1-5), 1 = only start/stop, 2 = + status and errors, 3 = + flow control, 4 = + data , 5 = anything)
 - `LOG_TYPE`: The type of log output. This could be a file, standard output (`sys.stdout`), etc.
 - `LOG_ADDRESS`: The address to which the logs are sent. This could be a file path, a server address, etc.
 - `LOG_PORT`: The port to which the logs are sent. This is used if the logs are sent to a server.
