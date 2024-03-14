@@ -27,6 +27,29 @@ systemctl start enverproxy-mqtt
 
 ### Docker container
 
+#### Pull the container from Docker Hub
+
+You can pull the container from Docker Hub and start it with the following commands. Replace the environment variables with your settings.
+
+```bash
+# Start the container (replace the environment variables with your settings)
+docker run \
+    --name enverproxy-mqtt \
+    -d \
+    --restart=unless-stopped \
+    -e LISTEN_PORT=1898 \
+    -e MQTTUSER=user \
+    -e MQTTPASSWORD=password \
+    -e MQTTHOST="127.0.0.1" \
+    -e MQTTPORT=1883 \
+    -e ID2DEVICE="{'123456' : 'bkw_panel_1', '123457' : 'bkw_panel_2'}" \
+    -e VERBOSITY=3 \
+    -p 1898:1898 -p 10013:1898 -p 14889:1898 \
+    team0/enverproxy-mqtt
+```
+
+#### Build the container
+
 You can also use the provided [Dockerfile](Dockerfile) to build a container. You can also use the provided [docker-compose.yml](docker-compose.yml) to start the container.
 
 ```bash
