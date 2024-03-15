@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/docker.yml'
+      - 'Dockerfile'
+      - '**.py'
 
 jobs:
   push_to_registry:
